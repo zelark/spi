@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CalcLexer implements Lexer{
-    private char[] text;
+    private final char[] text;
+    private List<Token> tokens = new ArrayList<Token>();
     private int pos = 0;
 
     private final char NONE = '\0';
@@ -16,7 +17,9 @@ public class CalcLexer implements Lexer{
 
     @Override
     public List<Token> tokenize() {
-        List<Token> tokens = new ArrayList<Token>();
+        if (!tokens.isEmpty()) {
+            return tokens;
+        }
         Token token = nextToken();
         while (token.type() != Token.TokenType.EOF) {
             tokens.add(token);
@@ -29,22 +32,13 @@ public class CalcLexer implements Lexer{
     private Token nextToken() {
         Character character = currentChar();
 
-        while (character != NONE && Character.isSpaceChar(character)) {
-            character = nextChar();
+        if (Character.isWhitespace(character)) {
+            skipWhitespaces();
+            character = currentChar();
         }
 
-        String number = null;
-        while (character != NONE && Character.isDigit(character)) {
-            if (number == null) {
-                number = character.toString();
-            }
-            else {
-                number = number + character.toString();
-            }
-            character = nextChar();
-        }
-        if (number != null) {
-            return new Token<Integer>(INTEGER, Integer.parseInt(number));
+        if (Character.isDigit(character)) {
+            return new Token<Integer>(INTEGER, integer());
         }
 
         if (character == '(') {
@@ -97,5 +91,22 @@ public class CalcLexer implements Lexer{
     private Character nextChar() {
         pos = pos + 1;
         return currentChar();
+    }
+
+    private void skipWhitespaces() {
+        Character character = currentChar();
+        while (character != NONE && Character.isSpaceChar(character)) {
+            character = this.nextChar();
+        }
+    }
+
+    private Integer integer() {
+        Character character = currentChar();
+        String number = "";
+        while (character != NONE && Character.isDigit(character)) {
+            number = number + character.toString();
+            character = this.nextChar();
+        }
+        return Integer.parseInt(number);
     }
 }
