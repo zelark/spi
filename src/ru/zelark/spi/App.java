@@ -1,8 +1,8 @@
 package ru.zelark.spi;
 
-import ru.zelark.spi.interpreter.CalcLexer;
-import ru.zelark.spi.interpreter.CalcParser;
-import ru.zelark.spi.interpreter.nodes.Ast;
+import ru.zelark.spi.interpreter.PascalLexer;
+import ru.zelark.spi.interpreter.Lexer;
+import ru.zelark.spi.interpreter.Token;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -18,8 +18,10 @@ public class App {
                 break;
             }
             else if (!line.equals("")) {
-                Ast ast = new CalcParser(new CalcLexer(line)).parse();
-                System.out.println(ast.evaluate());
+                Lexer lexer = new PascalLexer(line);
+                for (Token token : lexer.tokenize()) {
+                    System.out.println(token);
+                }
             }
         }
     }

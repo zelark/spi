@@ -2,16 +2,26 @@ package ru.zelark.spi.interpreter;
 
 import static ru.zelark.spi.interpreter.Token.TokenType.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class CalcLexer implements Lexer{
+public class PascalLexer implements Lexer{
+    private static final char NONE = '\0';
+    private static final Map<String, Token> reservedKeywords = new HashMap<>();
+
     private final char[] text;
-    private List<Token> tokens = new ArrayList<Token>();
     private int pos = 0;
 
-    private final char NONE = '\0';
+    private List<Token> tokens = new ArrayList<Token>();
 
-    public CalcLexer(String text) {
+    static
+    {
+        reservedKeywords.put("BEGIN", new Token<>(BEGIN, BEGIN.toString()));
+        reservedKeywords.put("END", new Token<>(END, END.toString()));
+    }
+
+    public PascalLexer(String text) {
         this.text = text.toCharArray();
     }
 
@@ -38,41 +48,61 @@ public class CalcLexer implements Lexer{
         }
 
         if (Character.isDigit(character)) {
-            return new Token<Integer>(INTEGER, integer());
+            return integer();
+        }
+
+        if (Character.isAlphabetic(character)) {
+            return id();
+        }
+
+        if (character == ':' && peekedChar() == '=') {
+            nextChar();
+            nextChar();
+            return new Token<>(ASSIGN, ":=");
+        }
+
+        if (character == ';') {
+            nextChar();
+            return new Token<>(SEMI, ";");
+        }
+
+        if (character == '.') {
+            nextChar();
+            return new Token<>(DOT, ".");
         }
 
         if (character == '(') {
             nextChar();
-            return new Token<String>(LPAREN, "(");
+            return new Token<>(LPAREN, "(");
         }
 
         if (character == ')') {
             nextChar();
-            return new Token<String>(RPAREN, ")");
+            return new Token<>(RPAREN, ")");
         }
 
         if (character == '+') {
             nextChar();
-            return new Token<String>(PLUS, "+");
+            return new Token<>(PLUS, "+");
         }
 
         if (character == '-') {
             nextChar();
-            return new Token<String>(MINUS, "-");
+            return new Token<>(MINUS, "-");
         }
 
         if (character == '*') {
             nextChar();
-            return new Token<String>(MUL, "*");
+            return new Token<>(MUL, "*");
         }
 
         if (character == '/') {
             nextChar();
-            return new Token<String>(DIV, "/");
+            return new Token<>(DIV, "/");
         }
 
         if (character == NONE) {
-            return new Token<String>(EOF, "None");
+            return new Token<>(EOF, "None");
         }
         else {
             throw new Error(String.format("Invalid character '%s' at position %d, ", currentChar(), pos));
@@ -93,6 +123,15 @@ public class CalcLexer implements Lexer{
         return currentChar();
     }
 
+    private Character peekedChar() {
+        if (pos + 1 > text.length - 1) {
+            return NONE;
+        }
+        else {
+            return text[pos + 1];
+        }
+    }
+
     private void skipWhitespaces() {
         Character character = currentChar();
         while (character != NONE && Character.isSpaceChar(character)) {
@@ -100,13 +139,23 @@ public class CalcLexer implements Lexer{
         }
     }
 
-    private Integer integer() {
+    private Token integer() {
         Character character = currentChar();
         String number = "";
         while (character != NONE && Character.isDigit(character)) {
             number = number + character.toString();
             character = this.nextChar();
         }
-        return Integer.parseInt(number);
+        return new Token<Integer>(INTEGER, Integer.parseInt(number));
+    }
+
+    private Token id() {
+        Character character = currentChar();
+        String name = "";
+        while (character != NONE && Character.isAlphabetic(character)) {
+            name = name + character.toString();
+            character = this.nextChar();
+        }
+        return reservedKeywords.getOrDefault(name, new Token<>(ID, name));
     }
 }
