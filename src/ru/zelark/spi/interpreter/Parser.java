@@ -1,7 +1,7 @@
 package ru.zelark.spi.interpreter;
 
-import ru.zelark.spi.interpreter.nodes.Ast;
+import ru.zelark.spi.interpreter.nodes.Runnable;
 
 public interface Parser {
-    Ast parse();
+    Runnable parse();
 }
