@@ -36,7 +36,7 @@ public class PascalParser implements Parser {
     public Runnable parse() {
         Runnable astTree = program();
         if (currentToken.type() != EOF) {
-            error();
+            error(currentToken.type());
         }
         return astTree;
     }
@@ -83,9 +83,6 @@ public class PascalParser implements Parser {
         while (currentToken.type() == SEMI) {
             eat(SEMI);
             statements.add(statement());
-        }
-        if (currentToken.type() == ID) {
-            error();
         }
         return statements;
     }
@@ -180,11 +177,13 @@ public class PascalParser implements Parser {
             currentToken = tokens.next();
         }
         else {
-            error();
+            error(type);
         }
     }
 
-    private void error() {
-        throw new Error("Invalid syntax");
+    private void error(Token.TokenType type) {
+        String message = String.format("Invalid syntax: expected token type is %s but actual one is %s.",
+                type.toString(), currentToken.type().toString());
+        throw new Error(message);
     }
 }
