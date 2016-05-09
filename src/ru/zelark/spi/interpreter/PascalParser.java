@@ -164,11 +164,14 @@ public class PascalParser implements Parser {
             eat(MINUS);
             return new UnaryOp(token, factor());
         }
-        else {
+        else if (token.type() == LPAREN) {
             eat(LPAREN);
             Evaluable node = expr();
             eat(RPAREN);
             return node;
+        }
+        else {
+            return variable();
         }
     }
 
