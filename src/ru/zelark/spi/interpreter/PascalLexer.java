@@ -17,8 +17,8 @@ public class PascalLexer implements Lexer{
 
     static
     {
-        reservedKeywords.put("BEGIN", new Token<>(BEGIN, BEGIN.toString()));
-        reservedKeywords.put("END", new Token<>(END, END.toString()));
+        reservedKeywords.put("begin", new Token<>(BEGIN, BEGIN.toString()));
+        reservedKeywords.put("end", new Token<>(END, END.toString()));
     }
 
     public PascalLexer(String text) {
@@ -156,6 +156,6 @@ public class PascalLexer implements Lexer{
             name = name + character.toString();
             character = this.nextChar();
         }
-        return reservedKeywords.getOrDefault(name, new Token<>(ID, name));
+        return reservedKeywords.getOrDefault(name.toLowerCase(), new Token<>(ID, name));
     }
 }
