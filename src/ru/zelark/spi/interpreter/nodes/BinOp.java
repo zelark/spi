@@ -3,12 +3,12 @@ package ru.zelark.spi.interpreter.nodes;
 import static ru.zelark.spi.interpreter.Token.TokenType.*;
 import ru.zelark.spi.interpreter.Token;
 
-public class BinOp implements Ast<Integer> {
+public class BinOp implements Evaluable<Integer> {
     private Token operator;
-    private Ast<Integer> left;
-    private Ast<Integer> right;
+    private Evaluable<Integer> left;
+    private Evaluable<Integer> right;
 
-    public BinOp (Token operator, Ast<Integer> left, Ast<Integer> right) {
+    public BinOp (Token operator, Evaluable<Integer> left, Evaluable<Integer> right) {
         this.operator = operator;
         this.left = left;
         this.right = right;

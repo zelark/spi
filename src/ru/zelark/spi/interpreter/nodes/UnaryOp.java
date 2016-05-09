@@ -3,11 +3,11 @@ package ru.zelark.spi.interpreter.nodes;
 import static ru.zelark.spi.interpreter.Token.TokenType.*;
 import ru.zelark.spi.interpreter.Token;
 
-public class UnaryOp implements Ast<Integer> {
+public class UnaryOp implements Evaluable<Integer> {
     private Token operator;
-    private Ast<Integer> right;
+    private Evaluable<Integer> right;
 
-    public UnaryOp (Token operator, Ast<Integer> right) {
+    public UnaryOp (Token operator, Evaluable<Integer> right) {
         this.operator = operator;
         this.right = right;
     }
