@@ -4,25 +4,26 @@ This is a simple interpreter, which I have been writing in Java. It's based on a
 
 For now, the interpreter can handle with only integers and supports following stuff:
 - BEGIN ... END blocks;
-- Integer variables like 'foo', 'bar' 'w41' and so on;
+- Integer variables like 'foo', 'bar' 'w' and so on;
 - Assignment operator ':=';
-- binary operations: '+', '-', '*', '/';
+- binary operations: '+', '-', '*', 'div';
 - unary operations: '+', '-';
 - parenthesized expressions with arbitrary depth nesting.
 
 The complete grammar is:
 ```
-    program : compound_statement DOT
+    program : compoundStatement DOT
 
-    compound_statement : BEGIN statement_list END
+    compoundStatement : BEGIN statementList END
 
-    statement_list : statement
-                   | statement SEMI statement_list
-    statement : compound_statement
-              | assignment_statement
+    statementList : statement
+                  | statement SEMI statementList
+
+    statement : compoundStatement
+              | assignmentStatement
               | empty
 
-    assignment_statement : variable ASSIGN expr
+    assignmentStatement : variable ASSIGN expr
 
     empty :
 
