@@ -1,6 +1,7 @@
 package ru.zelark.spi.interpreter;
 
 import static ru.zelark.spi.interpreter.Token.TokenType.*;
+import com.sun.tools.javac.util.FatalError;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +20,7 @@ public class PascalLexer implements Lexer{
     {
         reservedKeywords.put("begin", new Token<>(BEGIN, BEGIN.toString()));
         reservedKeywords.put("end", new Token<>(END, END.toString()));
+        reservedKeywords.put("div", new Token<>(DIV, DIV.toString()));
     }
 
     public PascalLexer(String text) {
@@ -96,16 +98,11 @@ public class PascalLexer implements Lexer{
             return new Token<>(MUL, "*");
         }
 
-        if (character == '/') {
-            nextChar();
-            return new Token<>(DIV, "/");
-        }
-
         if (character == NONE) {
             return new Token<>(EOF, "None");
         }
         else {
-            throw new Error(String.format("Invalid character '%s' at position %d, ", currentChar(), pos));
+            throw new FatalError(String.format("Illegal character '%s' at position %d, ", currentChar(), pos));
         }
     }
 
@@ -145,6 +142,9 @@ public class PascalLexer implements Lexer{
         while (character != NONE && Character.isDigit(character)) {
             number = number + character.toString();
             character = this.nextChar();
+        }
+        if (Character.isAlphabetic(character)) {
+            throw new FatalError(String.format("Illegal character '%s' at position %d, ", currentChar(), pos));
         }
         return new Token<Integer>(INTEGER, Integer.parseInt(number));
     }
