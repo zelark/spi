@@ -1,13 +1,12 @@
 package ru.zelark.spi.interpreter;
 
 import static ru.zelark.spi.interpreter.Token.TokenType.*;
-import com.sun.tools.javac.util.FatalError;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class PascalLexer implements Lexer{
+public class PascalLexer implements Lexer {
     private static final char NONE = '\0';
     private static final Map<String, Token> reservedKeywords = new HashMap<>();
 
@@ -102,7 +101,7 @@ public class PascalLexer implements Lexer{
             return new Token<>(EOF, "None");
         }
         else {
-            throw new FatalError(String.format("Illegal character '%s' at position %d, ", currentChar(), pos));
+            throw new Error(String.format("Illegal character '%s' at position %d, ", currentChar(), pos));
         }
     }
 
@@ -144,7 +143,7 @@ public class PascalLexer implements Lexer{
             character = this.nextChar();
         }
         if (Character.isAlphabetic(character)) {
-            throw new FatalError(String.format("Illegal character '%s' at position %d, ", currentChar(), pos));
+            throw new Error(String.format("Illegal character '%s' at position %d, ", currentChar(), pos));
         }
         return new Token<Integer>(INTEGER, Integer.parseInt(number));
     }
