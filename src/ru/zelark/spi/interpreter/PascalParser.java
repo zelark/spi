@@ -14,22 +14,21 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.Iterator;
-import java.util.Map;
 
 public class PascalParser implements Parser {
     private Iterator<Token> tokens;
     private Token currentToken;
 
-    private final Map<String, Integer> ram;
+    private final SymbolTable symbolTable;
 
     // precedence of operators
     private final EnumSet<Token.TokenType> level1 = EnumSet.of(MUL, DIV);
     private final EnumSet<Token.TokenType> level2 = EnumSet.of(PLUS, MINUS);
 
-    public PascalParser(Lexer lexer, Map<String, Integer> ram) {
+    public PascalParser(Lexer lexer, SymbolTable symbolTable) {
         this.tokens = lexer.tokenize().iterator();
         this.currentToken = this.tokens.next();
-        this.ram = ram;
+        this.symbolTable = symbolTable;
     }
 
     @Override
@@ -104,11 +103,11 @@ public class PascalParser implements Parser {
         Token token = currentToken;
         eat(ASSIGN);
         Evaluable right = expr();
-        return new Assign<Integer>(left, right, ram);
+        return new Assign<Integer>(left, right, symbolTable);
     }
 
     private Var variable() {
-        Var node = new Var(currentToken, ram);
+        Var node = new Var(currentToken, symbolTable);
         eat(ID);
         return node;
     }

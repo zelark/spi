@@ -1,18 +1,15 @@
 package ru.zelark.spi.interpreter.nodes;
 
+import ru.zelark.spi.interpreter.SymbolTable;
 import ru.zelark.spi.interpreter.Token;
 
-import java.util.Map;
-
 public class Var implements Evaluable<Integer>{
-    private final Token token;
     private final String name;
-    private final Map<String, Integer> ram;
+    private final SymbolTable symbolTable;
 
-    public Var(Token token, Map<String, Integer> ram) {
-        this.token = token;
-        this.name = token.value().toLowerCase();
-        this.ram = ram;
+    public Var(Token token, SymbolTable symbolTable) {
+        this.name = token.value();
+        this.symbolTable = symbolTable;
     }
 
     public String name() {
@@ -21,9 +18,6 @@ public class Var implements Evaluable<Integer>{
 
     @Override
     public Integer evaluate() {
-        if (ram.containsKey(name)) {
-            return ram.get(name);
-        }
-        throw new Error(String.format("Variable '%s' not found.", token.value()));
+        return symbolTable.get(name);
     }
 }
