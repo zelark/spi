@@ -17,9 +17,9 @@ public class PascalLexer implements Lexer {
 
     static
     {
-        reservedKeywords.put("begin", new Token<>(BEGIN, BEGIN.toString()));
-        reservedKeywords.put("end", new Token<>(END, END.toString()));
-        reservedKeywords.put("div", new Token<>(DIV, DIV.toString()));
+        reservedKeywords.put("begin", new Token(BEGIN, BEGIN.toString()));
+        reservedKeywords.put("end", new Token(END, END.toString()));
+        reservedKeywords.put("div", new Token(DIV, DIV.toString()));
     }
 
     public PascalLexer(String text) {
@@ -59,46 +59,46 @@ public class PascalLexer implements Lexer {
         if (character == ':' && peekedChar() == '=') {
             nextChar();
             nextChar();
-            return new Token<>(ASSIGN, ":=");
+            return new Token(ASSIGN, ":=");
         }
 
         if (character == ';') {
             nextChar();
-            return new Token<>(SEMI, ";");
+            return new Token(SEMI, ";");
         }
 
         if (character == '.') {
             nextChar();
-            return new Token<>(DOT, ".");
+            return new Token(DOT, ".");
         }
 
         if (character == '(') {
             nextChar();
-            return new Token<>(LPAREN, "(");
+            return new Token(LPAREN, "(");
         }
 
         if (character == ')') {
             nextChar();
-            return new Token<>(RPAREN, ")");
+            return new Token(RPAREN, ")");
         }
 
         if (character == '+') {
             nextChar();
-            return new Token<>(PLUS, "+");
+            return new Token(PLUS, "+");
         }
 
         if (character == '-') {
             nextChar();
-            return new Token<>(MINUS, "-");
+            return new Token(MINUS, "-");
         }
 
         if (character == '*') {
             nextChar();
-            return new Token<>(MUL, "*");
+            return new Token(MUL, "*");
         }
 
         if (character == NONE) {
-            return new Token<>(EOF, "None");
+            return new Token(EOF, "None");
         }
         else {
             throw new Error(String.format("Illegal character '%s' at position %d, ", currentChar(), pos));
@@ -145,7 +145,7 @@ public class PascalLexer implements Lexer {
         if (Character.isAlphabetic(character)) {
             throw new Error(String.format("Illegal character '%s' at position %d, ", currentChar(), pos));
         }
-        return new Token<Integer>(INTEGER, Integer.parseInt(number));
+        return new Token(INTEGER, number);
     }
 
     private Token id() {
@@ -155,6 +155,6 @@ public class PascalLexer implements Lexer {
             name = name + character.toString();
             character = this.nextChar();
         }
-        return reservedKeywords.getOrDefault(name.toLowerCase(), new Token<>(ID, name));
+        return reservedKeywords.getOrDefault(name.toLowerCase(), new Token(ID, name));
     }
 }

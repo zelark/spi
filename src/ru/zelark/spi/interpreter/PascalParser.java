@@ -151,7 +151,7 @@ public class PascalParser implements Parser {
         Token token = currentToken;
         if (token.type() == INTEGER) {
             eat(INTEGER);
-            return new Num<Integer>(token);
+            return new Num<>(new Integer(token.value()));
         }
         else if (token.type() == PLUS) {
             eat(PLUS);
