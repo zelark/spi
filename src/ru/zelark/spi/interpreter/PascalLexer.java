@@ -130,7 +130,7 @@ public class PascalLexer implements Lexer {
 
     private void skipWhitespaces() {
         Character character = currentChar();
-        while (character != NONE && Character.isSpaceChar(character)) {
+        while (character != NONE && Character.isWhitespace(character)) {
             character = this.nextChar();
         }
     }
