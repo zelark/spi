@@ -2,17 +2,25 @@ package ru.zelark.spi.interpreter;
 
 public class Token {
     public enum TokenType {
+        PROGRAM,
+        VAR,
         BEGIN,
         END,
         DOT,
+        COMMA,
+        COLON,
+        SEMI,
         ID,
         ASSIGN,
-        SEMI,
+        INTEGER_CONST,
+        REAL_CONST,
         INTEGER,
+        REAL,
         PLUS,
         MINUS,
         MUL,
-        DIV,
+        INTEGER_DIV,
+        REAL_DIV,
         LPAREN,
         RPAREN,
         EOF
