@@ -128,14 +128,13 @@ public class PascalParser implements Parser {
     //           | assignmentStatement
     //           | empty
     private Runnable statement() {
-        if (currentToken.type() == BEGIN) {
-            return compoundStatement();
-        }
-        else if (currentToken.type() == ID) {
-            return assignmentStatement();
-        }
-        else {
-            return empty();
+        switch (currentToken.type()) {
+            case BEGIN:
+                return compoundStatement();
+            case ID:
+                return assignmentStatement();
+            default:
+                return empty();
         }
     }
 
@@ -165,11 +164,13 @@ public class PascalParser implements Parser {
         Evaluable node = term();
         while (level2.contains(currentToken.type())) {
             Token token = currentToken;
-            if (token.type() == PLUS) {
-                eat(PLUS);
-            }
-            if (token.type() == MINUS) {
-                eat(MINUS);
+            switch (token.type()) {
+                case PLUS:
+                    eat(PLUS);
+                    break;
+                case MINUS:
+                    eat(MINUS);
+                    break;
             }
             node = new BinOp(token, node, term());
         }
@@ -181,15 +182,16 @@ public class PascalParser implements Parser {
         Evaluable node = factor();
         while (level1.contains(currentToken.type())) {
             Token token = currentToken;
-            // TODO: it can be replaced by case.
-            if (token.type() == MUL) {
-                eat(MUL);
-            }
-            if (token.type() == INTEGER_DIV) {
-                eat(INTEGER_DIV);
-            }
-            if (token.type() == REAL_DIV) {
-                eat(REAL_DIV);
+            switch (token.type()) {
+                case MUL:
+                    eat(MUL);
+                    break;
+                case INTEGER_DIV:
+                    eat(INTEGER_DIV);
+                    break;
+                case REAL_DIV:
+                    eat(REAL_DIV);
+                    break;
             }
             node = new BinOp(token, node, factor());
         }
@@ -205,31 +207,26 @@ public class PascalParser implements Parser {
     //        | variable
     private Evaluable factor() {
         Token token = currentToken;
-        // TODO: it can be replaced by case.
-        if (token.type() == INTEGER_CONST) {
-            eat(INTEGER_CONST);
-            return new Num<>(new BigDecimal(token.value()));
-        }
-        else if (token.type() == REAL_CONST) {
-            eat(REAL_CONST);
-            return new Num<>(new BigDecimal(token.value()));
-        }
-        else if (token.type() == PLUS) {
-            eat(PLUS);
-            return new UnaryOp(token, factor());
-        }
-        else if (token.type() == MINUS) {
-            eat(MINUS);
-            return new UnaryOp(token, factor());
-        }
-        else if (token.type() == LPAREN) {
-            eat(LPAREN);
-            Evaluable node = expr();
-            eat(RPAREN);
-            return node;
-        }
-        else {
-            return variable();
+        switch (token.type()) {
+            case INTEGER_CONST:
+                eat(INTEGER_CONST);
+                return new Num<>(new BigDecimal(token.value()));
+            case REAL_CONST:
+                eat(REAL_CONST);
+                return new Num<>(new BigDecimal(token.value()));
+            case PLUS:
+                eat(PLUS);
+                return new UnaryOp(token, factor());
+            case MINUS:
+                eat(MINUS);
+                return new UnaryOp(token, factor());
+            case LPAREN:
+                eat(LPAREN);
+                Evaluable node = expr();
+                eat(RPAREN);
+                return node;
+            default:
+                return variable();
         }
     }
 
