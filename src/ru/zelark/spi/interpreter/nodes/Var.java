@@ -3,7 +3,9 @@ package ru.zelark.spi.interpreter.nodes;
 import ru.zelark.spi.interpreter.SymbolTable;
 import ru.zelark.spi.interpreter.Token;
 
-public class Var implements Evaluable<Integer>{
+import java.math.BigDecimal;
+
+public class Var implements Evaluable<BigDecimal>{
     private final String name;
     private final SymbolTable symbolTable;
 
@@ -17,7 +19,7 @@ public class Var implements Evaluable<Integer>{
     }
 
     @Override
-    public Integer evaluate() {
+    public BigDecimal evaluate() {
         return symbolTable.get(name);
     }
 }

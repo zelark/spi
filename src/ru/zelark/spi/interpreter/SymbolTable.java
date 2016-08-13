@@ -1,7 +1,9 @@
 package ru.zelark.spi.interpreter;
 
+import java.math.BigDecimal;
+
 public interface SymbolTable {
-    Integer get(String name);
+    BigDecimal get(String name);
 
     void put(String name, Object value);
 

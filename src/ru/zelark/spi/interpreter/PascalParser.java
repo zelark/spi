@@ -1,19 +1,26 @@
 package ru.zelark.spi.interpreter;
 
-import static ru.zelark.spi.interpreter.Token.TokenType.*;
 import ru.zelark.spi.interpreter.nodes.Assign;
-import ru.zelark.spi.interpreter.nodes.Evaluable;
-import ru.zelark.spi.interpreter.nodes.Num;
-import ru.zelark.spi.interpreter.nodes.Runnable;
-import ru.zelark.spi.interpreter.nodes.UnaryOp;
 import ru.zelark.spi.interpreter.nodes.BinOp;
-import ru.zelark.spi.interpreter.nodes.NoOp;
+import ru.zelark.spi.interpreter.nodes.Block;
 import ru.zelark.spi.interpreter.nodes.Compound;
+import ru.zelark.spi.interpreter.nodes.Evaluable;
+import ru.zelark.spi.interpreter.nodes.NoOp;
+import ru.zelark.spi.interpreter.nodes.Num;
+import ru.zelark.spi.interpreter.nodes.Program;
+import ru.zelark.spi.interpreter.nodes.Runnable;
+import ru.zelark.spi.interpreter.nodes.Type;
+import ru.zelark.spi.interpreter.nodes.UnaryOp;
 import ru.zelark.spi.interpreter.nodes.Var;
-import java.util.List;
+import ru.zelark.spi.interpreter.nodes.VarsDeclaration;
+
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.Iterator;
+import java.util.List;
+
+import static ru.zelark.spi.interpreter.Token.TokenType.*;
 
 public class PascalParser implements Parser {
     private Iterator<Token> tokens;
@@ -22,7 +29,7 @@ public class PascalParser implements Parser {
     private final SymbolTable symbolTable;
 
     // precedence of operators
-    private final EnumSet<Token.TokenType> level1 = EnumSet.of(MUL, DIV);
+    private final EnumSet<Token.TokenType> level1 = EnumSet.of(MUL, INTEGER_DIV, REAL_DIV);
     private final EnumSet<Token.TokenType> level2 = EnumSet.of(PLUS, MINUS);
 
     public PascalParser(Lexer lexer, SymbolTable symbolTable) {
@@ -40,32 +47,55 @@ public class PascalParser implements Parser {
         return astTree;
     }
 
-    /**
-         program: compound_statement DOT
-
-         compound_statement: BEGIN statement_list END
-
-         statement_list: statement | statement SEMI statement_list
-
-         statement: compound_statement | assignment_statement | empty
-
-         assignment_statement: variable ASSIGN expr
-
-         empty:
-
-         expr: term ((PLUS | MINUS) term)*
-
-         term: factor ((MUL | DIV) factor)*
-
-         factor: PLUS factor | MINUS factor | INTEGER | LPAREN expr RPAREN | variable
-
-         variable: ID
-     */
-
-    private Runnable program() {
-        Runnable node = compoundStatement();
+    /* program : PROGRAM variable SEMI block DOT */
+    private Program program() {
+        eat(PROGRAM);
+        String progName = variable().name();
+        eat(SEMI);
+        Program prog = new Program(progName, block());
         eat(DOT);
-        return node;
+        return prog;
+    }
+
+    private Block block() {
+        return new Block(declarations(), compoundStatement());
+    }
+
+    private List<VarsDeclaration> declarations() {
+        List<VarsDeclaration> declarations = new ArrayList<>();
+        if (currentToken.type() == VAR) {
+            eat(VAR);
+            while(currentToken.type() == ID) {
+                declarations.add(varsDeclaration());
+                eat(SEMI);
+            }
+        }
+        return declarations;
+    }
+
+    private VarsDeclaration varsDeclaration() {
+        List<Var> variables = new ArrayList<>();
+        variables.add(new Var(currentToken, symbolTable));
+        eat(ID);
+        while (currentToken.type() == COMMA) {
+            eat(COMMA);
+            variables.add(new Var(currentToken, symbolTable));
+            eat(ID);
+        }
+        eat(COLON);
+        Type type = typeSpec();
+        return new VarsDeclaration(variables, type);
+    }
+
+    private Type typeSpec() {
+        Token token = currentToken;
+        if (token.type() == INTEGER) {
+            eat(INTEGER);
+        }
+        else {
+            eat(REAL);
+        }
+        return new Type(token);
     }
 
     private Runnable compoundStatement() {
@@ -103,7 +133,7 @@ public class PascalParser implements Parser {
         Token token = currentToken;
         eat(ASSIGN);
         Evaluable right = expr();
-        return new Assign<Integer>(left, right, symbolTable);
+        return new Assign<BigDecimal>(left, right, symbolTable);
     }
 
     private Var variable() {
@@ -131,26 +161,44 @@ public class PascalParser implements Parser {
         return node;
     }
 
+    // term : factor ((MUL | INTEGER_DIV | REAL_DIV) factor)*
     private Evaluable term() {
         Evaluable node = factor();
         while (level1.contains(currentToken.type())) {
             Token token = currentToken;
+            // TODO: it can be replaced by case.
             if (token.type() == MUL) {
                 eat(MUL);
             }
-            if (token.type() == DIV) {
-                eat(DIV);
+            if (token.type() == INTEGER_DIV) {
+                eat(INTEGER_DIV);
+            }
+            if (token.type() == REAL_DIV) {
+                eat(REAL_DIV);
             }
             node = new BinOp(token, node, factor());
         }
         return node;
     }
 
+    /*
+        factor : INTEGER_CONST
+               | REAL_CONST
+               | PLUS factor
+               | MINUS factor
+               | LPAREN expr RPAREN
+               | variable
+    */
     private Evaluable factor() {
         Token token = currentToken;
-        if (token.type() == INTEGER) {
-            eat(INTEGER);
-            return new Num<>(new Integer(token.value()));
+        // TODO: it can be replaced by case.
+        if (token.type() == INTEGER_CONST) {
+            eat(INTEGER_CONST);
+            return new Num<>(new BigDecimal(token.value()));
+        }
+        else if (token.type() == REAL_CONST) {
+            eat(REAL_CONST);
+            return new Num<>(new BigDecimal(token.value()));
         }
         else if (token.type() == PLUS) {
             eat(PLUS);

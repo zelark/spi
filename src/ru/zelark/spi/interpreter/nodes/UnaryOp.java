@@ -3,22 +3,24 @@ package ru.zelark.spi.interpreter.nodes;
 import static ru.zelark.spi.interpreter.Token.TokenType.*;
 import ru.zelark.spi.interpreter.Token;
 
-public class UnaryOp implements Evaluable<Integer> {
-    private Token operator;
-    private Evaluable<Integer> right;
+import java.math.BigDecimal;
 
-    public UnaryOp (Token operator, Evaluable<Integer> right) {
+public class UnaryOp implements Evaluable<BigDecimal> {
+    private Token operator;
+    private Evaluable<BigDecimal> right;
+
+    public UnaryOp (Token operator, Evaluable<BigDecimal> right) {
         this.operator = operator;
         this.right = right;
     }
 
     @Override
-    public Integer evaluate() {
+    public BigDecimal evaluate() {
         if (operator.type() == PLUS) {
             return right.evaluate();
         }
         else if (operator.type() == MINUS) {
-            return -right.evaluate();
+            return right.evaluate().negate();
         }
         else {
             throw new Error("Invalid operation");
