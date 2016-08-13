@@ -1,17 +1,19 @@
 package ru.zelark.spi.interpreter;
 
+import java.math.BigDecimal;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Objects;
 
 public class SimpleSymbolTable implements SymbolTable {
-    private Map symbolTable = new HashMap();
+    private Map<String, Object> symbolTable = new HashMap<>();
 
     @Override
-    public Integer get(String name) {
+    public BigDecimal get(String name) {
         String key = name.toLowerCase();
         if (symbolTable.containsKey(key)) {
-            return (Integer) symbolTable.get(key);
+            return (BigDecimal) symbolTable.get(key);
         }
         throw new Error(String.format("Variable '%s' not found.", name));
     }
@@ -22,11 +24,6 @@ public class SimpleSymbolTable implements SymbolTable {
     }
 
     public void dump() {
-        Iterator it = symbolTable.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry)it.next();
-            System.out.println(pair.getKey() + " -> " + pair.getValue());
-            it.remove(); // avoids a ConcurrentModificationException
-        }
+        symbolTable.forEach((k, v) -> System.out.println(k + " -> " + v));
     }
 }
