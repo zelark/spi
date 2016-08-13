@@ -55,5 +55,5 @@ For now, the interpreter supports following stuff:
 
 ### How to use
 ```
-> java -jar sip.jar test.pas
+> java -jar spi.jar test.pas
 ```

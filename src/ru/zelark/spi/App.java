@@ -16,7 +16,7 @@ public class App {
     public static void main(String[] args) throws IOException {
 
         if (args.length != 1) {
-            System.err.println("Usage: sip <file.pas> ");
+            System.err.println("Usage: spi <file.pas> ");
             System.exit(1);
         }
 
