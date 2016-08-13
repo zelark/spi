@@ -47,7 +47,7 @@ public class PascalParser implements Parser {
         return astTree;
     }
 
-    /* program : PROGRAM variable SEMI block DOT */
+    // program : PROGRAM variable SEMI block DOT
     private Program program() {
         eat(PROGRAM);
         String progName = variable().name();
@@ -57,10 +57,13 @@ public class PascalParser implements Parser {
         return prog;
     }
 
+    // block : declarations compoundStatement
     private Block block() {
         return new Block(declarations(), compoundStatement());
     }
 
+    // declarations : VAR (varsDeclaration SEMI)+
+    //              | empty
     private List<VarsDeclaration> declarations() {
         List<VarsDeclaration> declarations = new ArrayList<>();
         if (currentToken.type() == VAR) {
@@ -73,6 +76,7 @@ public class PascalParser implements Parser {
         return declarations;
     }
 
+    // varsDeclaration : ID (COMMA ID)* COLON typeSpec
     private VarsDeclaration varsDeclaration() {
         List<Var> variables = new ArrayList<>();
         variables.add(new Var(currentToken, symbolTable));
@@ -87,6 +91,7 @@ public class PascalParser implements Parser {
         return new VarsDeclaration(variables, type);
     }
 
+    // typeSpec : INTEGER | REAL
     private Type typeSpec() {
         Token token = currentToken;
         if (token.type() == INTEGER) {
@@ -98,6 +103,7 @@ public class PascalParser implements Parser {
         return new Type(token);
     }
 
+    // compoundStatement : BEGIN statementList END
     private Runnable compoundStatement() {
         eat(BEGIN);
         List<Runnable> nodes = statementList();
@@ -105,6 +111,8 @@ public class PascalParser implements Parser {
         return new Compound(nodes);
     }
 
+    // statementList : statement
+    //               | statement SEMI statementList
     private List<Runnable> statementList() {
         Runnable node = statement();
         List<Runnable> statements = new ArrayList<>();
@@ -116,6 +124,9 @@ public class PascalParser implements Parser {
         return statements;
     }
 
+    // statement : compoundStatement
+    //           | assignmentStatement
+    //           | empty
     private Runnable statement() {
         if (currentToken.type() == BEGIN) {
             return compoundStatement();
@@ -128,6 +139,7 @@ public class PascalParser implements Parser {
         }
     }
 
+    // assignmentStatement : variable ASSIGN expr
     private Runnable assignmentStatement() {
         Var left = variable();
         Token token = currentToken;
@@ -136,16 +148,19 @@ public class PascalParser implements Parser {
         return new Assign<BigDecimal>(left, right, symbolTable);
     }
 
+    // variable : ID
     private Var variable() {
         Var node = new Var(currentToken, symbolTable);
         eat(ID);
         return node;
     }
 
+    // empty :
     private Runnable empty() {
         return new NoOp();
     }
 
+    // term ((PLUS | MINUS) term)*
     private Evaluable expr() {
         Evaluable node = term();
         while (level2.contains(currentToken.type())) {
@@ -181,14 +196,13 @@ public class PascalParser implements Parser {
         return node;
     }
 
-    /*
-        factor : INTEGER_CONST
-               | REAL_CONST
-               | PLUS factor
-               | MINUS factor
-               | LPAREN expr RPAREN
-               | variable
-    */
+
+    // factor : INTEGER_CONST
+    //        | REAL_CONST
+    //        | PLUS factor
+    //        | MINUS factor
+    //        | LPAREN expr RPAREN
+    //        | variable
     private Evaluable factor() {
         Token token = currentToken;
         // TODO: it can be replaced by case.
