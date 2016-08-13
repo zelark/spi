@@ -1,4 +1,4 @@
-Sipmple Pascal Interpreter
+Simple Pascal Interpreter
 ==========================
 This is a simple interpreter, which I have been writing in Java. It's based on a series ["Let's build a simple interpreter"] (https://ruslanspivak.com/lsbasi-part1/). The series is great. I highly recommend it to you.
 
@@ -9,11 +9,11 @@ For now, the interpreter supports following stuff:
 - Integer variables like 'foo', 'bar' 'w42' and so on;
 - Assignment operator ':=';
 - Integer and real variables;
-- binary operations: '+', '-', '*', 'div' and /;
+- binary operations: '+', '-', '*', 'div' and '/';
 - unary operations: '+', '-';
 - parenthesized expressions with arbitrary depth nesting.
 
-The complete grammar is:
+### Grammar
 ```
     program : PROGRAM variable SEMI block DOT
 
@@ -51,4 +51,9 @@ The complete grammar is:
            | MINUS factor
            | LPAREN expr RPAREN
            | variable
+```
+
+### How to use
+```
+> java -jar sip.jar test.pas
 ```
