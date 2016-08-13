@@ -28,5 +28,6 @@ public class SimpleSymbolTable implements SymbolTable {
             System.out.println(pair.getKey() + " -> " + pair.getValue());
             it.remove(); // avoids a ConcurrentModificationException
         }
+        symbolTable.forEach((k, v) -> System.out.println(k + " -> " + v));
     }
 }

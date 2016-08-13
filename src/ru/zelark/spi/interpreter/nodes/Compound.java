@@ -11,8 +11,6 @@ public class Compound implements Runnable{
 
     @Override
     public void run() {
-        for (Runnable child : children) {
-            child.run();
-        }
+        children.forEach(Runnable::run);
     }
 }
